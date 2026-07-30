@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A premium, highly animated, and fully responsive GitHub project showcase portfolio. Built with Canvas animations, custom themes, and dynamic repo fetching.">
+    <title>StellarPort // Premium Interactive GitHub Portfolio</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Main Style Sheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body data-theme="dark">
+
+    <!-- Interactive Particle Background Canvas -->
+    <canvas id="particle-canvas"></canvas>
+
+    <!-- Floating Navigation Bar -->
+    <nav class="nav-bar" id="navbar">
+        <div class="nav-logo">
+            <span class="logo-accent">//</span> StellarPort
+        </div>
+        <div class="nav-links">
+            <a href="#hero" class="nav-link active"><i class="fa-solid fa-house"></i> Home</a>
+            <a href="#projects" class="nav-link"><i class="fa-solid fa-code"></i> Projects</a>
+            <a href="#skills" class="nav-link"><i class="fa-solid fa-layer-group"></i> Tech Stack</a>
+            <a href="#contact" class="nav-link"><i class="fa-solid fa-paper-plane"></i> Contact</a>
+        </div>
+        <div class="nav-controls">
+            <!-- Theme Trigger Button -->
+            <button class="control-btn" id="theme-btn" title="Toggle Theme" aria-label="Toggle Theme">
+                <i class="fa-solid fa-moon"></i>
+            </button>
+            <!-- Settings Modal Trigger -->
+            <button class="control-btn" id="settings-btn" title="Configure Profile" aria-label="Configure Profile">
+                <i class="fa-solid fa-gear"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Settings Modal -->
+    <div class="modal-overlay" id="settings-modal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-sliders"></i> Configuration Hub</h3>
+                <button class="close-modal-btn" id="close-modal" aria-label="Close Settings">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="github-username-input">GitHub Username</label>
+                    <div class="input-with-button">
+                        <input type="text" id="github-username-input" placeholder="e.g. octocat" aria-label="Enter GitHub Username">
+                        <button class="primary-btn" id="save-username-btn">Load Projects</button>
+                    </div>
+                    <small>Enter any GitHub username to dynamically fetch and display their repositories.</small>
+                </div>
+                
+                <div class="form-group">
+                    <label>Select Aesthetic Vibe</label>
+                    <div class="theme-grid">
+                        <button class="theme-select-btn active" data-theme-val="dark">
+                            <i class="fa-solid fa-circle-half-stroke"></i> Dark Nebula
+                        </button>
+                        <button class="theme-select-btn" data-theme-val="cyberpunk">
+                            <i class="fa-solid fa-bolt-lightning"></i> Cyber Neon
+                        </button>
+                        <button class="theme-select-btn" data-theme-val="light">
+                            <i class="fa-solid fa-sun"></i> Light Solar
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Canvas Particles Density</label>
+                    <div class="slider-container">
+                        <input type="range" id="particle-density" min="20" max="150" value="80" aria-label="Particle Density">
+                        <span id="density-val">80 particles</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <main class="content-wrapper">
+
+        <!-- Hero Section -->
+        <section class="hero-section" id="hero">
+            <div class="hero-grid">
+                <div class="hero-text-content">
+                    <div class="status-badge scroll-reveal">
+                        <span class="pulse-dot"></span>
+                        <span id="profile-status">Fetching Stellar Data...</span>
+                    </div>
+                    <h1 class="hero-title scroll-reveal">
+                        Unveiling Code in <span class="gradient-text">HD Dimension</span>
+                    </h1>
+                    <p class="hero-subtitle scroll-reveal">
+                        Welcome to a dynamic, real-time repository hub. Explore the digital universe of code repositories with premium animations and full developer metrics.
+                    </p>
+                    <div class="hero-actions scroll-reveal">
+                        <a href="#projects" class="primary-btn pulse-glow"><i class="fa-solid fa-rocket"></i> Explore Work</a>
+                        <a href="#contact" class="secondary-btn"><i class="fa-solid fa-envelope"></i> Let's Connect</a>
+                    </div>
+                </div>
+
+                <!-- Profile Card (Dynamic Skeleton & Loaded State) -->
+                <div class="profile-card-container scroll-reveal">
+                    <div class="glass-card profile-card" id="profile-card-display">
+                        <!-- Loading State / Skeleton -->
+                        <div class="profile-loading" id="profile-loading-skeleton">
+                            <div class="skeleton skeleton-avatar"></div>
+                            <div class="skeleton skeleton-title"></div>
+                            <div class="skeleton skeleton-text"></div>
+                            <div class="skeleton-stats-row">
+                                <div class="skeleton skeleton-stat"></div>
+                                <div class="skeleton skeleton-stat"></div>
+                                <div class="skeleton skeleton-stat"></div>
+                            </div>
+                        </div>
+
+                        <!-- Loaded Content -->
+                        <div class="profile-loaded-content hidden" id="profile-real-content">
+                            <div class="profile-header">
+                                <img src="" alt="Github Profile Picture" class="profile-avatar" id="user-avatar">
+                                <div class="profile-title-block">
+                                    <h2 id="user-fullname">Developer Name</h2>
+                                    <a href="" target="_blank" id="user-github-link" class="profile-handle">@username</a>
+                                </div>
+                            </div>
+                            <p class="profile-bio" id="user-bio">This is where the user bio from Github will appear. Writing code and building awesome repositories.</p>
+                            
+                            <div class="profile-stats">
+                                <div class="stat-box">
+                                    <span class="stat-num" id="stat-repos">0</span>
+                                    <span class="stat-label">Repositories</span>
+                                </div>
+                                <div class="stat-box">
+                                    <span class="stat-num" id="stat-followers">0</span>
+                                    <span class="stat-label">Followers</span>
+                                </div>
+                                <div class="stat-box">
+                                    <span class="stat-num" id="stat-gists">0</span>
+                                    <span class="stat-label">Gists</span>
+                                </div>
+                            </div>
+
+                            <div class="profile-meta">
+                                <span class="meta-item" id="meta-location"><i class="fa-solid fa-location-dot"></i> <span>Earth</span></span>
+                                <span class="meta-item" id="meta-blog"><i class="fa-solid fa-link"></i> <span>Website</span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Projects Grid Section -->
+        <section class="projects-section" id="projects">
+            <div class="section-header scroll-reveal">
+                <span class="section-tag">// REPOSITORIES</span>
+                <h2 class="section-title">Showcasing the Codebase</h2>
+                <p class="section-subtitle">Real-time repository statistics pulled dynamically from Github. Search or filter by main programming language.</p>
+            </div>
+
+            <!-- Search and Filter Controls -->
+            <div class="filter-controls-wrapper scroll-reveal">
+                <div class="glass-card filter-card">
+                    <div class="search-box">
+                        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                        <input type="text" id="project-search" placeholder="Search repositories by name or description..." aria-label="Search repositories">
+                    </div>
+                    <div class="filter-buttons" id="language-filter-container">
+                        <button class="filter-btn active" data-filter="all">All Projects</button>
+                        <!-- Dynamic filter buttons will inject here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Repository Cards Container -->
+            <div class="projects-grid" id="projects-grid-container">
+                <!-- Repository skeleton cards will load here first -->
+                <div class="glass-card project-card skeleton-card">
+                    <div class="skeleton skeleton-title"></div>
+                    <div class="skeleton skeleton-text" style="width: 90%;"></div>
+                    <div class="skeleton skeleton-text" style="width: 75%;"></div>
+                    <div class="skeleton-meta-row">
+                        <div class="skeleton skeleton-tag"></div>
+                        <div class="skeleton skeleton-tag"></div>
+                    </div>
+                </div>
+                <div class="glass-card project-card skeleton-card">
+                    <div class="skeleton skeleton-title"></div>
+                    <div class="skeleton skeleton-text" style="width: 85%;"></div>
+                    <div class="skeleton skeleton-text" style="width: 60%;"></div>
+                    <div class="skeleton-meta-row">
+                        <div class="skeleton skeleton-tag"></div>
+                        <div class="skeleton skeleton-tag"></div>
+                    </div>
+                </div>
+                <div class="glass-card project-card skeleton-card">
+                    <div class="skeleton skeleton-title"></div>
+                    <div class="skeleton skeleton-text" style="width: 95%;"></div>
+                    <div class="skeleton skeleton-text" style="width: 80%;"></div>
+                    <div class="skeleton-meta-row">
+                        <div class="skeleton skeleton-tag"></div>
+                        <div class="skeleton skeleton-tag"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Empty State -->
+            <div class="empty-state-view hidden" id="empty-state">
+                <i class="fa-solid fa-ban empty-icon"></i>
+                <h3>No Repositories Found</h3>
+                <p>We couldn't find any repositories matching your search query or language filter.</p>
+            </div>
+        </section>
+
+        <!-- Tech Stack / Skills Section -->
+        <section class="skills-section" id="skills">
+            <div class="section-header scroll-reveal">
+                <span class="section-tag">// EXPERTISES</span>
+                <h2 class="section-title">Technology Systems</h2>
+                <p class="section-subtitle">A collection of primary developmental tools, scripting environments, and structural libraries.</p>
+            </div>
+
+            <div class="skills-grid scroll-reveal">
+                <!-- Frontend Glass Card -->
+                <div class="glass-card skill-category-card">
+                    <div class="card-icon"><i class="fa-solid fa-code"></i></div>
+                    <h3>Frontend Systems</h3>
+                    <div class="skill-list">
+                        <div class="skill-item">
+                            <div class="skill-info">
+                                <span>HTML5 / CSS3 / ES6+</span>
+                                <span>95%</span>
+                            </div>
+                            <div class="skill-progress-bg">
+                                <div class="skill-progress-bar" style="width: 95%"></div>
+                            </div>
+                        </div>
+                        <div class="skill-item">
+                            <div class="skill-info">
+                                <span>Modern Frameworks (React/Vue/Vite)</span>
+                                <span>85%</span>
+                            </div>
+                            <div class="skill-progress-bg">
+                                <div class="skill-progress-bar" style="width: 85%"></div>
+                            </div>
+                        </div>
+                        <div class="skill-item">
+                            <div class="skill-info">
+                                <span>UI Layout & Canvas Animation</span>
+                                <span>90%</span>
+                            </div>
+                            <div class="skill-progress-bg">
+                                <div class="skill-progress-bar" style="width: 90%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Backend Glass Card -->
+                <div class="glass-card skill-category-card">
+                    <div class="card-icon"><i class="fa-solid fa-server"></i></div>
+                    <h3>Backend & APIs</h3>
+                    <div class="skill-list">
+                        <div class="skill-item">
+                            <div class="skill-info">
+                                <span>Node.js / Express</span>
+                                <span>80%</span>
+                            </div>
+                            <div class="skill-progress-bg">
+                                <div class="skill-progress-bar" style="width: 80%"></div>
+                            </div>
+                        </div>
+                        <div class="skill-item">
+                            <div class="skill-info">
+                                <span>Rest APIs / GraphQL</span>
+                                <span>90%</span>
+                            </div>
+                            <div class="skill-progress-bg">
+                                <div class="skill-progress-bar" style="width: 90%"></div>
+                            </div>
+                        </div>
+                        <div class="skill-item">
+                            <div class="skill-info">
+                                <span>Databases (PostgreSQL, MongoDB)</span>
+                                <span>75%</span>
+                            </div>
+                            <div class="skill-progress-bg">
+                                <div class="skill-progress-bar" style="width: 75%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Devops / Tools Glass Card -->
+                <div class="glass-card skill-category-card">
+                    <div class="card-icon"><i class="fa-solid fa-screwdriver-wrench"></i></div>
+                    <h3>Operations & Workflows</h3>
+                    <div class="skill-list">
+                        <div class="skill-item">
+                            <div class="skill-info">
+                                <span>Git Version Control</span>
+                                <span>95%</span>
+                            </div>
+                            <div class="skill-progress-bg">
+                                <div class="skill-progress-bar" style="width: 95%"></div>
+                            </div>
+                        </div>
+                        <div class="skill-item">
+                            <div class="skill-info">
+                                <span>Docker & Containerization</span>
+                                <span>70%</span>
+                            </div>
+                            <div class="skill-progress-bg">
+                                <div class="skill-progress-bar" style="width: 70%"></div>
+                            </div>
+                        </div>
+                        <div class="skill-item">
+                            <div class="skill-info">
+                                <span>CI/CD Automations (GitHub Actions)</span>
+                                <span>80%</span>
+                            </div>
+                            <div class="skill-progress-bg">
+                                <div class="skill-progress-bar" style="width: 80%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section class="contact-section" id="contact">
+            <div class="section-header scroll-reveal">
+                <span class="section-tag">// COMMUNICATE</span>
+                <h2 class="section-title">Establish Connection</h2>
+                <p class="section-subtitle">Feel free to initiate contact for project collaboration, developmental work, or simply general questions.</p>
+            </div>
+
+            <div class="contact-grid scroll-reveal">
+                <div class="glass-card contact-details">
+                    <h3>Get in touch</h3>
+                    <p>Have an interesting project proposal or a question about one of my repositories? Hit me up. I'm always open to discussing new ideas or technical systems.</p>
+                    
+                    <div class="contact-links-list">
+                        <a href="mailto:example@gmail.com" class="contact-link-item">
+                            <div class="contact-icon-bg"><i class="fa-solid fa-envelope"></i></div>
+                            <div>
+                                <h4>Email Connection</h4>
+                                <p>example@gmail.com</p>
+                            </div>
+                        </a>
+                        <div class="contact-link-item">
+                            <div class="contact-icon-bg"><i class="fa-solid fa-location-dot"></i></div>
+                            <div>
+                                <h4>Geographic Location</h4>
+                                <p>Planet Earth</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="social-links">
+                        <a href="https://github.com" target="_blank" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
+                        <a href="https://linkedin.com" target="_blank" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+                        <a href="https://twitter.com" target="_blank" aria-label="Twitter"><i class="fa-brands fa-twitter"></i></a>
+                    </div>
+                </div>
+
+                <div class="glass-card contact-form-card">
+                    <form id="contact-form" onsubmit="event.preventDefault(); alert('Message simulation sent successfully!'); this.reset();">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="form-name">Name</label>
+                                <input type="text" id="form-name" placeholder="John Doe" required aria-label="Your Name">
+                            </div>
+                            <div class="form-group">
+                                <label for="form-email">Email</label>
+                                <input type="email" id="form-email" placeholder="john@example.com" required aria-label="Your Email">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="form-subject">Subject</label>
+                            <input type="text" id="form-subject" placeholder="Project collaboration proposal..." required aria-label="Subject">
+                        </div>
+                        <div class="form-group">
+                            <label for="form-message">Transmission Content</label>
+                            <textarea id="form-message" rows="5" placeholder="Write details here..." required aria-label="Message Details"></textarea>
+                        </div>
+                        <button type="submit" class="primary-btn form-submit-btn"><i class="fa-solid fa-paper-plane"></i> Send Message</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer-wrap">
+        <p>&copy; 2026 StellarPort. Dynamic repository showcase dashboard.</p>
+        <p class="footer-subtext">Built with vanilla CSS grid, canvas web rendering, and the GitHub REST API.</p>
+    </footer>
+
+    <!-- Main JavaScript File -->
+    <script src="app.js"></script>
+</body>
+</html>
